@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Varshith Interior Solution - Designer</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root{--maxw:1200px}
+    body{font-family:Arial,Helvetica,sans-serif;margin:12px;display:flex;flex-direction:column;align-items:center}
+    .container{max-width:var(--maxw);width:100%;display:grid;grid-template-columns:1fr 480px;gap:18px}
+    header{text-align:center;font-weight:700;font-size:22px;margin-bottom:6px}
+    .panel{border:1px solid #ddd;padding:12px;border-radius:8px;background:#fff}
+    label{display:block;margin:6px 0 4px;font-size:13px}
+    input[type="number"], input[type="text"], select{width:100%;padding:6px;border:1px solid #ccc;border-radius:4px}
+    button{margin:6px 6px 6px 0;padding:8px 10px;border-radius:6px;border:0;background:#1976d2;color:#fff;cursor:pointer}
+    button.secondary{background:#555}
+    #workspace{height:560px;border:1px solid #ccc;border-radius:8px;display:flex}
+    #leftArea{padding-right:6px}
+    #floorCanvasWrap{position:relative;flex:1;min-width:0;height:420px;border:1px solid #eee;background:#fafafa; display:flex; justify-content:center; align-items:center; overflow:hidden}
+    #floorCanvas{max-width:100%; max-height:100%; display:block}
+    #drawOverlay{position:absolute;left:0;top:0;pointer-events:none}
+    .controls{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px}
+    #threeViewport{width:100%;height:420px; background:#f5f5f5; border-radius:6px; overflow:hidden}
+    .right-column{display:flex;flex-direction:column;gap:12px}
+    #invoice{min-height:160px}
+    .invoice-header{ text-align:center; font-size:20px; font-weight:700; margin-bottom:8px }
+    .invoice-body{font-size:14px}
+    footer.invoice-footer{display:flex;justify-content:space-between;font-size:12px;border-top:1px solid #ddd;padding-top:8px;margin-top:8px}
+    .small{font-size:12px;color:#555}
+  </style>
+</head>
+<body>
+  <header>Varshith Interior Solution</header>
+  <div class="container">
+    <div id="leftArea">
+      <div class="panel">
+        <h3>Upload 2D Floor Plan & Draw Walls</h3>
+        <div>
+          <label>Upload floor plan image (jpg/png)</label>
+          <input type="file" id="imgUpload" accept="image/*">
+        </div>
+        <div class="controls">
+          <label style="width:120px">Wall thickness (m)</label>
+          <input type="number" id="wallThickness" value="0.2" min="0.01" step="0.01" style="width:80px">
+          <label style="width:120px">Wall height (m)</label>
+          <input type="number" id="wallHeight" value="3" min="0.5" step="0.1" style="width:80px">
+        </div>
+        <div class="controls" style="margin-top:8px">
+          <button id="startDraw">Start Draw</button>
+          <button id="finishPoly" class="secondary">Finish Current Wall</button>
+          <button id="clearAll" class="secondary">Clear All Walls</button>
+          <button id="convert3D">Convert to 3D</button>
+        </div>
+        <div style="margin-top:10px" class="small">Draw: click to add points, double-click to finish a polyline. Use multiple polylines for multiple walls.</div>
+        <hr>
+        <div>
+          <h3>Cost Calculator</h3>
+          <label>Rate per meter of wall length (₹)</label>
+          <input type="number" id="ratePerMeter" value="500" min="0" step="1">
+          <label>Or fixed per-wall cost (₹) - optional (leave 0 to ignore)</label>
+          <input type="number" id="fixedPerWall" value="0" min="0" step="1">
+          <div style="margin-top:8px">
+            <button id="calcCost">Calculate Cost</button>
+            <button id="resetInvoice" class="secondary">Reset Invoice</button>
+          </div>
+          <div id="calcResult" class="small" style="margin-top:8px">Total length: 0 m — Walls: 0 — Total cost: ₹0</div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top:12px">
+        <h3>Floorplan / Drawing Area</h3>
+        <div id="floorCanvasWrap">
+          <img id="floorCanvas" alt="Upload a floor plan" />
+          <svg id="drawOverlay"></svg>
+        </div>
+        <div style="margin-top:8px" class="controls">
+          <button id="zoomIn" class="secondary">Zoom In</button>
+          <button id="zoomOut" class="secondary">Zoom Out</button>
+          <button id="panMode" class="secondary">Pan Mode</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="right-column">
+      <div class="panel">
+        <h3>3D Preview</h3>
+        <div id="threeViewport"></div>
+        <div class="small" style="margin-top:8px">Use mouse to orbit, scroll to zoom.</div>
+      </div>
+
+      <div class="panel">
+        <h3>Invoice</h3>
+        <div id="invoice">
+          <div class="invoice-header">Varshith Interior Solution</div>
+          <div class="invoice-body">
+            <label>Customer Name</label>
+            <input type="text" id="custName" value="Customer Name">
+            <label>Invoice Number</label>
+            <input type="text" id="invNo" value="INV-001">
+            <label>Total Length (m)</label>
+            <input type="text" id="invLength" readonly>
+            <label>Wall Count</label>
+            <input type="text" id="invWalls" readonly>
+            <label>Total Cost (₹)</label>
+            <input type="text" id="invTotal" readonly>
+            <div class="invoice-footer">
+              <div>No 39 BRN Ashish Layout Anekal - 562106</div>
+              <div>+91 9916511599 &amp; +91 8553608981</div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:8px">
+          <button id="downloadPDF">Download Invoice (PDF)</button>
+          <button id="saveJSON" class="secondary">Save Invoice (JSON)</button>
+          <input type="file" id="invoiceUpload" accept=".json" style="display:inline-block;margin-left:6px">
+          <button id="loadInvoice" class="secondary">Load Invoice JSON</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/controls/OrbitControls.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+
+  <script>
+  // ---------- Utility & State ----------
+  const floorImg = document.getElementById('floorCanvas');
+  const overlay = document.getElementById('drawOverlay');
+  const imgWrap = document.getElementById('floorCanvasWrap');
+
+  let drawing = false;
+  let drawMode = false;
+  let currentPoints = [];
+  let allWalls = []; // array of polylines, each = [{x,y},...]
+  let scale = 1; // image zoom
+  let pan = {x:0,y:0};
+
+  // set overlay SVG size to match image wrapper
+  function resizeOverlay(){
+    overlay.setAttribute('width', imgWrap.clientWidth);
+    overlay.setAttribute('height', imgWrap.clientHeight);
+    overlay.style.width = imgWrap.clientWidth+'px';
+    overlay.style.height = imgWrap.clientHeight+'px';
+  }
+  window.addEventListener('resize', resizeOverlay);
+
+  // ---------- Image Upload ----------
+  document.getElementById('imgUpload').addEventListener('change', (ev)=>{
+    const f = ev.target.files[0];
+    if(!f) return;
+    const url = URL.createObjectURL(f);
+    floorImg.src = url;
+    floorImg.onload = ()=> {
+      // adjust overlay size
+      resizeOverlay();
+      // clear
+      clearOverlay();
+      allWalls = [];
+      updateStats();
+    };
+  });
+
+  // ---------- Drawing on image ----------
+  function svgPoint(clientX, clientY){
+    const rect = imgWrap.getBoundingClientRect();
+    // get coordinates relative to image center/scaled area
+    let x = clientX - rect.left;
+    let y = clientY - rect.top;
+    // clamp
+    x = Math.max(0, Math.min(rect.width, x));
+    y = Math.max(0, Math.min(rect.height, y));
+    return {x, y};
+  }
+
+  function drawCurrent(){
+    clearOverlay();
+    // draw all saved walls
+    allWalls.forEach(poly => {
+      const path = document.createElementNS('http://www.w3.org/2000/svg','polyline');
+      path.setAttribute('points', poly.map(p=>`${p.x},${p.y}`).join(' '));
+      path.setAttribute('stroke','#e53935');
+      path.setAttribute('stroke-width','3');
+      path.setAttribute('fill','none');
+      overlay.appendChild(path);
+    });
+    // draw current
+    if(currentPoints.length){
+      const path = document.createElementNS('http://www.w3.org/2000/svg','polyline');
+      path.setAttribute('points', currentPoints.map(p=>`${p.x},${p.y}`).join(' '));
+      path.setAttribute('stroke','#1565c0');
+      path.setAttribute('stroke-width','3');
+      path.setAttribute('fill','none');
+      overlay.appendChild(path);
+      // draw points
+      currentPoints.forEach(p=>{
+        const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+        c.setAttribute('cx',p.x); c.setAttribute('cy',p.y); c.setAttribute('r',4); c.setAttribute('fill','#fff'); c.setAttribute('stroke','#1565c0'); overlay.appendChild(c);
+      });
+    }
+  }
+
+  function clearOverlay(){
+    while(overlay.firstChild) overlay.removeChild(overlay.firstChild);
+  }
+
+  document.getElementById('startDraw').addEventListener('click', ()=>{
+    drawMode = true;
+    currentPoints = [];
+    drawCurrent();
+    alert('Draw mode active: click to add points. Double-click to finish current wall.');
+  });
+
+  // finish wall
+  function finishWall(){
+    if(currentPoints.length < 2) { currentPoints = []; drawCurrent(); return; }
+    allWalls.push(currentPoints.slice());
+    currentPoints = [];
+    drawCurrent();
+    updateStats();
+  }
+
+  // double click finishes
+  imgWrap.addEventListener('dblclick', (ev)=>{
+    if(!drawMode) return;
+    finishWall();
+  });
+
+  // single click add point
+  imgWrap.addEventListener('click', (ev)=>{
+    // ignore clicks on controls
+    if(!drawMode) return;
+    const p = svgPoint(ev.clientX, ev.clientY);
+    currentPoints.push(p);
+    drawCurrent();
+  });
+
+  document.getElementById('finishPoly').addEventListener('click', finishWall);
+  document.getElementById('clearAll').addEventListener('click', ()=>{
+    if(!confirm('Clear all drawn walls?')) return;
+    allWalls = []; currentPoints = []; drawCurrent(); updateStats();
+  });
+
+  // ---------- Simple measurement conversion ----------
+  // We need a mapping from image px -> real world meters. For prototype: ask user for scale.
+  // We'll provide a prompt when converting to 3D.
+  function calcLengthOfPoly(poly){
+    let L = 0;
+    for(let i=1;i<poly.length;i++){
+      const dx = poly[i].x - poly[i-1].x;
+      const dy = poly[i].y - poly[i-1].y;
+      L += Math.hypot(dx,dy);
+    }
+    return L;
+  }
+
+  function totalImagePixelsLength(){
+    let L = 0;
+    allWalls.forEach(poly => L += calcLengthOfPoly(poly));
+    return L;
+  }
+
+  function updateStats(){
+    const pxLen = totalImagePixelsLength();
+    document.getElementById('calcResult').innerText = `Total pixel length: ${pxLen.toFixed(1)} px — Walls: ${allWalls.length}`;
+  }
+
+  // ---------- 3D (Three.js) setup ----------
+  const threeWrap = document.getElementById('threeViewport');
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xf7f7f7);
+  const camera = new THREE.PerspectiveCamera(60, threeWrap.clientWidth / threeWrap.clientHeight, 0.1, 2000);
+  camera.position.set(10,10,15);
+  const renderer = new THREE.WebGLRenderer({antialias:true});
+  renderer.setSize(threeWrap.clientWidth, threeWrap.clientHeight);
+  threeWrap.appendChild(renderer.domElement);
+
+  // lights
+  const ambient = new THREE.AmbientLight(0xffffff,0.7); scene.add(ambient);
+  const dir = new THREE.DirectionalLight(0xffffff,0.6); dir.position.set(20,40,10); scene.add(dir);
+
+  // ground grid
+  const grid = new THREE.GridHelper(200, 200, 0xcccccc, 0xeeeeee); scene.add(grid);
+
+  // controls
+  let controls;
+  try {
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.target.set(0,0,0);
+    controls.update();
+  } catch(e){ /* ignore if not available */ }
+
+  // container for walls
+  const wallsGroup = new THREE.Group();
+  scene.add(wallsGroup);
+
+  function animate(){
+    requestAnimationFrame(animate);
+    renderer.render(scene,camera);
+  }
+  animate();
+
+  // handle resize
+  new ResizeObserver(()=> {
+    renderer.setSize(threeWrap.clientWidth, threeWrap.clientHeight);
+    camera.aspect = threeWrap.clientWidth/threeWrap.clientHeight;
+    camera.updateProjectionMatrix();
+  }).observe(threeWrap);
+
+  // ---------- Convert 2D polylines to 3D walls ----------
+  document.getElementById('convert3D').addEventListener('click', async ()=>{
+    if(allWalls.length===0) return alert('No walls drawn.');
+    // ask user for image scale: pixels per meter OR distance in image representing known meters
+    const knownPx = prompt('If you know: how many pixels equals a known distance? (enter pixel length), or cancel to set scale 100 px = 1 m', '');
+    let pxPerMeter;
+    if(knownPx && !isNaN(Number(knownPx))){
+      const knownMeters = prompt('Enter the real-world meters that correspond to those pixels (for example 5)', '1');
+      if(!knownMeters || isNaN(Number(knownMeters))){ alert('Invalid meters'); return; }
+      pxPerMeter = Number(knownPx)/Number(knownMeters);
+    } else {
+      // default mapping
+      pxPerMeter = 100; // 100 px = 1 m
+      if(!confirm('Default scale: 100 px = 1 m. OK?')) return;
+    }
+
+    // read params
+    const wallHeight = Number(document.getElementById('wallHeight').value) || 3;
+    const wallThickness = Number(document.getElementById('wallThickness').value) || 0.2;
+
+    // clear previous 3D walls
+    while(wallsGroup.children.length) wallsGroup.remove(wallsGroup.children[0]);
+
+    // for each polyline, create boxes for each segment
+    const material = new THREE.MeshStandardMaterial({color:0x8d6e63});
+    allWalls.forEach(poly => {
+      for(let i=1;i<poly.length;i++){
+        const p1 = poly[i-1], p2 = poly[i];
+        // mid point in image px coordinates
+        const mx = (p1.x + p2.x)/2, my = (p1.y + p2.y)/2;
+        const dx = p2.x - p1.x, dy = p2.y - p1.y;
+        const segPxLen = Math.hypot(dx,dy);
+        const segLenM = segPxLen / pxPerMeter;
+
+        // length and thickness in meters -> convert to Three.js units (use meters directly)
+        const length = segLenM;
+        const thickness = wallThickness;
+        const height = wallHeight;
+
+        // create box geometry centered at origin, then position/rotate
+        const geom = new THREE.BoxGeometry(length, height, thickness);
+        const mesh = new THREE.Mesh(geom, material);
+        // convert image coords to world coords: map image center -> world origin, y invert
+        // Let's map px -> meters via pxPerMeter, and place X as image x, Z as inverted image y
+        // compute world positions (relative to image center)
+        const imgRect = imgWrap.getBoundingClientRect();
+        const cx = imgRect.width/2, cy = imgRect.height/2;
+        const wx = (mx - cx) / pxPerMeter; // meters
+        const wz = -(my - cy) / pxPerMeter; // invert y to z
+
+        mesh.position.set(wx, height/2, wz);
+        // rotate to align with segment
+        const angle = Math.atan2(dy, dx);
+        mesh.rotation.y = -angle; // sign correction
+        wallsGroup.add(mesh);
+      }
+    });
+
+    // reposition camera to fit scene roughly
+    camera.position.set(5,5,8);
+    controls && controls.update();
+    alert('Converted to 3D. You may orbit/zoom the view. Use Calculate Cost to build invoice.');
+  });
+
+  // ---------- Cost calculation & invoice ----------
+  function calcCosts(){
+    const pxLen = totalImagePixelsLength();
+    if(pxLen===0) return {lengthMeters:0,walls:0,total:0};
+    // approximate px->m same as used in conversion default: 100 px = 1 m
+    // But better: prefer asking user when converting. Here we keep same default mapping for estimation.
+    const pxPerMeter = 100;
+    const lengthMeters = pxLen / pxPerMeter;
+    const wallsCount = allWalls.length;
+    const rate = Number(document.getElementById('ratePerMeter').value) || 0;
+    const fixed = Number(document.getElementById('fixedPerWall').value) || 0;
+    const total = Math.round((lengthMeters * rate + wallsCount * fixed) * 100) / 100;
+    return {lengthMeters: Math.round(lengthMeters*100)/100, walls: wallsCount, total};
+  }
+
+  document.getElementById('calcCost').addEventListener('click', ()=>{
+    const res = calcCosts();
+    document.getElementById('calcResult').innerText = `Total length: ${res.lengthMeters} m — Walls: ${res.walls} — Total cost: ₹${res.total}`;
+    // populate invoice
+    document.getElementById('invLength').value = res.lengthMeters + ' m';
+    document.getElementById('invWalls').value = res.walls;
+    document.getElementById('invTotal').value = res.total;
+  });
+
+  document.getElementById('resetInvoice').addEventListener('click', ()=>{
+    document.getElementById('custName').value = 'Customer Name';
+    document.getElementById('invNo').value = 'INV-001';
+    document.getElementById('invLength').value = '';
+    document.getElementById('invWalls').value = '';
+    document.getElementById('invTotal').value = '';
+  });
+
+  // ---------- PDF / JSON Invoice ----------
+  document.getElementById('downloadPDF').addEventListener('click', ()=>{
+    // create a printable invoice element clone (to ensure header/footer formatting)
+    const inv = document.getElementById('invoice').cloneNode(true);
+    // ensure styles for pdf: header centered, footer left/right
+    const popup = document.createElement('div');
+    popup.style.padding = '18px';
+    popup.style.width = '840px';
+    popup.appendChild(inv);
+    // use html2pdf
+    html2pdf().from(popup).set({
+      margin: 10,
+      filename: `${document.getElementById('invNo').value || 'invoice'}.pdf`,
+      html2canvas: {scale:2},
+      jsPDF: {unit:'mm', format:'a4', orientation:'portrait'}
+    }).save();
+  });
+
+  document.getElementById('saveJSON').addEventListener('click', ()=>{
+    const payload = {
+      customer: document.getElementById('custName').value,
+      invoiceNo: document.getElementById('invNo').value,
+      length: document.getElementById('invLength').value,
+      walls: document.getElementById('invWalls').value,
+      total: document.getElementById('invTotal').value,
+      wallsData: allWalls // image coordinates; useful for reloading
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = (payload.invoiceNo||'invoice') + '.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+  });
+
+  document.getElementById('loadInvoice').addEventListener('click', ()=>{
+    const f = document.getElementById('invoiceUpload').files[0];
+    if(!f) return alert('Choose a JSON invoice file to upload.');
+    const r = new FileReader();
+    r.onload = (e)=>{
+      try{
+        const data = JSON.parse(e.target.result);
+        document.getElementById('custName').value = data.customer || '';
+        document.getElementById('invNo').value = data.invoiceNo || '';
+        document.getElementById('invLength').value = data.length || '';
+        document.getElementById('invWalls').value = data.walls || '';
+        document.getElementById('invTotal').value = data.total || '';
+        // reload walls if present
+        if(Array.isArray(data.wallsData)){
+          allWalls = data.wallsData;
+          drawCurrent();
+          updateStats();
+          alert('Loaded walls from invoice JSON (if any).');
+        }
+      }catch(err){ alert('Invalid JSON file'); }
+    };
+    r.readAsText(f);
+  });
+
+  // ---------- simple pan/zoom (optional) ----------
+  let zoomLevel = 1;
+  document.getElementById('zoomIn').addEventListener('click', ()=> {
+    zoomLevel *= 1.2; applyZoom();
+  });
+  document.getElementById('zoomOut').addEventListener('click', ()=> {
+    zoomLevel /= 1.2; applyZoom();
+  });
+  function applyZoom(){
+    floorImg.style.transform = `scale(${zoomLevel})`;
+    overlay.style.transform = `scale(${zoomLevel})`;
+    overlay.style.transformOrigin = 'left top';
+  }
+
+  // pan mode (not fully implemented heavy)
+  document.getElementById('panMode').addEventListener('click', ()=> {
+    alert('Pan mode: you can drag the image to pan. (Click and drag while pressing space).');
+  });
+
+  // initialize overlay size
+  resizeOverlay();
+  </script>
+</body>
+</html>
