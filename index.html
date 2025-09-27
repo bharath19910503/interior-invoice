@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Varshith Interior Solutions - Invoice Generator</title>
+</head>
+<body>
+    <h1>Invoice Generator</h1>
+    <form method="POST" action="/generate">
+        <label>Customer Name:</label><br>
+        <input type="text" name="customer_name" required><br><br>
+        
+        <label>Project Address:</label><br>
+        <input type="text" name="project_address" required><br><br>
+        
+        <label>Invoice Number:</label><br>
+        <input type="text" name="invoice_no" required><br><br>
+        
+        <label>Work Items (JSON format):</label><br>
+        <textarea name="items" rows="10" cols="50" placeholder='[{"work":"TV Paneling","materials":"Plywood + Laminate Finish","cost":35000}]' required></textarea><br><br>
+        
+        <label>GST %:</label><br>
+        <input type="number" name="gst" value="18" required><br><br>
+        
+        <label>Timeline (days):</label><br>
+        <input type="number" name="timeline" value="20" required><br><br>
+        
+        <input type="submit" value="Generate PDF">
+    </form>
+</body>
+</html>
