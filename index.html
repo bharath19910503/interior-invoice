@@ -66,9 +66,7 @@
               <th></th>
             </tr>
           </thead>
-          <tbody>
-            <!-- rows inserted dynamically -->
-          </tbody>
+          <tbody></tbody>
         </table>
       </div>
 
@@ -78,7 +76,7 @@
         <div class="final">Final Cost: <span id="finalCost">0.00</span></div>
       </div>
 
-      <textarea id="note" rows="3">50% of the quoted amount has to be paid as advance, 30% after completing 50% of work and remaining 20% on completion.</textarea>
+      <textarea id="note" rows="3">50% of the quoted amount has to be paid as advance, 30% after completing 50% of work, and remaining 20% on completion.</textarea>
 
       <div class="actions">
         <button id="generatePDFBtn" class="primary">Download Invoice PDF</button>
@@ -89,16 +87,14 @@
     </section>
 
     <section class="right-col">
-      <h2>2D → 3D Designer (Multiple)</h2>
+      <h2>2D → 3D Designer</h2>
 
       <div class="uploader">
         <input id="upload2D" type="file" accept="image/*" multiple>
         <div class="hint">Select multiple images; each will appear below with a name and Generate 3D button.</div>
       </div>
 
-      <div id="designList" class="design-list">
-        <!-- uploaded designs render here -->
-      </div>
+      <div id="designList" class="design-list"></div>
 
       <div id="progressContainer" class="progress-container" aria-hidden="true" style="display:none;">
         <div id="progressBar" class="progress-bar"></div>
