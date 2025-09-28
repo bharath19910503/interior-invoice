@@ -1,94 +1,42 @@
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background: #f4f4f4;
+:root{
+  --green: #2e7d32;
+  --muted: #f4f6f5;
 }
-
-header {
-    background: #28a745;
-    color: white;
-    display: flex;
-    align-items: center;
-    padding: 10px 20px;
-}
-
-header .logo {
-    width: 50px;
-    margin-right: 15px;
-}
-
-main {
-    padding: 20px;
-}
-
-.invoice-section, .design-section {
-    background: white;
-    padding: 20px;
-    margin-bottom: 20px;
-    border-radius: 8px;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-}
-
-table, th, td {
-    border: 1px solid #ddd;
-}
-
-th, td {
-    padding: 8px;
-    text-align: left;
-}
-
-th {
-    background: #28a745;
-    color: white;
-}
-
-.totals {
-    margin-top: 15px;
-}
-
-.totals label {
-    display: inline-block;
-    margin-bottom: 10px;
-}
-
-#progressBarContainer {
-    width: 100%;
-    height: 20px;
-    background: #ddd;
-    margin-top: 10px;
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-#progressBar {
-    height: 100%;
-    width: 0;
-    background: #28a745;
-}
-
-#threeContainer {
-    width: 100%;
-    height: 400px;
-    margin-top: 10px;
-    background: #eaeaea;
-}
-
-.note {
-    margin-top: 10px;
-    font-style: italic;
-}
-
-footer {
-    text-align: center;
-    padding: 15px;
-    background: #28a745;
-    color: white;
-    position: relative;
-}
+*{box-sizing:border-box}
+body{font-family:Arial,Helvetica,sans-serif;margin:0;background:var(--muted);color:#222}
+header{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:var(--green);color:#fff}
+header .header-left, header .header-center, header .header-right{display:flex;align-items:center}
+header img{width:72px;height:72px;object-fit:contain;background:#fff;padding:4px;border-radius:6px;margin-right:10px}
+header .logo-upload input{display:none}
+header h1{margin:0;font-size:20px}
+header .company-sub{font-size:12px;opacity:.95;margin-top:4px}
+main{display:flex;gap:20px;padding:18px}
+.left-col{flex:1;min-width:380px}
+.right-col{width:520px;max-width:48%}
+.invoice-meta{display:flex;gap:8px;margin:10px 0}
+.invoice-meta input{padding:8px;border:1px solid #ccc;border-radius:4px;flex:1}
+.controls{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+.controls button, .controls label .btn{background:var(--green);color:#fff;border:none;padding:8px 10px;border-radius:5px;cursor:pointer}
+.table-wrap{overflow:auto;border-radius:6px;background:#fff;padding:6px}
+.invoice-table{width:100%;border-collapse:collapse;table-layout:fixed}
+.invoice-table th, .invoice-table td{border:1px solid #e0e0e0;padding:8px;vertical-align:top;overflow:hidden;text-overflow:ellipsis}
+.invoice-table th{background:var(--green);color:#fff;white-space:nowrap}
+.invoice-table td input{width:100%;border:0;padding:4px;outline:none}
+.invoice-table td .deleteBtn{background:#c62828;color:#fff;border:none;padding:6px 8px;border-radius:4px;cursor:pointer}
+.invoice-table th:nth-child(1){width:20%}
+.invoice-table th:nth-child(2){width:25%}
+.invoice-table th:nth-child(3){width:10%}
+.invoice-table th:nth-child(4){width:15%}
+.invoice-table th:nth-child(5){width:15%}
+.summary{margin-top:10px;display:flex;gap:18px;align-items:center}
+.summary div{background:#fff;padding:8px;border-radius:6px;border:1px solid #eee;min-width:150px}
+.summary .final{font-weight:700}
+#note{width:100%;margin-top:10px;padding:8px;border-radius:6px;border:1px solid #ddd}
+.actions{margin-top:10px;display:flex;gap:10px}
+.actions .primary{background:#1565c0}
+.progress-container{width:100%;height:14px;background:#e6e6e6;border-radius:8px;overflow:hidden;margin-top:8px}
+.progress-bar{height:100%;width:0;background:linear-gradient(90deg,var(--green),#66bb6a)}
+.preview-3d{width:100%;height:380px;background:#f0f0f0;border-radius:6px;border:1px solid #ddd;margin-top:10px}
+.preview-note{font-size:12px;color:#555;margin-top:6px}
+footer{background:var(--green);color:#fff;padding:10px 18px;text-align:center;margin-top:18px}
+.btn{display:inline-block}
