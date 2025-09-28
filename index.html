@@ -1,61 +1,196 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Varshith Interior Solution</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Varshith Interior Solutions</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+<style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f0f0f0; }
+    header { background-color: green; color: white; padding: 15px; text-align: center; font-size: 24px; }
+    footer { background-color: green; color: white; padding: 10px; text-align: center; position: fixed; bottom: 0; width: 100%; }
+    .container { padding: 20px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: center; background-color: white; }
+    th { background-color: green; color: white; }
+    input[type="number"] { width: 80px; text-align: center; }
+    button { padding: 10px 15px; margin: 5px; background-color: green; color: white; border: none; cursor: pointer; }
+    button:hover { opacity: 0.8; }
+    #threeContainer { width: 100%; height: 400px; background-color: #ccc; margin-bottom: 20px; }
+    #progressBar { width: 100%; background-color: #ddd; margin-bottom: 15px; }
+    #progress { width: 0%; height: 20px; background-color: green; text-align: center; color: white; }
+    .total-section p { margin: 5px 0; }
+</style>
 </head>
 <body>
-    <header>
-        <h1>Varshith Interior Solution</h1>
-    </header>
 
-    <main>
-        <section class="upload-section">
-            <h2>Upload 2D Design</h2>
-            <form id="uploadForm" enctype="multipart/form-data">
-                <input type="file" name="design" accept="image/*">
-                <button type="submit">Generate 3D Design</button>
-            </form>
-            <div id="progress"></div>
-            <div id="preview3d"></div>
-        </section>
+<header>Varshith Interior Solutions</header>
 
-        <section class="invoice-section">
-            <h2>Invoice</h2>
-            <table id="invoiceTable">
-                <thead>
-                    <tr>
-                        <th>Item</th>
-                        <th>Material Used</th>
-                        <th>Qty</th>
-                        <th>Amount</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-            <button id="addRow">Add Item</button>
+<div class="container">
+    <table id="invoiceTable">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Material Used</th>
+                <th>Qty</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody id="invoiceBody">
+            <tr>
+                <td contenteditable="true">Item 1</td>
+                <td contenteditable="true">Material 1</td>
+                <td contenteditable="true">1</td>
+                <td contenteditable="true">0</td>
+            </tr>
+        </tbody>
+    </table>
+    <button onclick="addRow()">Add Item</button>
+    <label>GST %: <input type="number" id="gstInput" value="18" onchange="calculateTotal()"></label>
 
-            <div id="totals">
-                <p>Total Cost: <span id="totalCost">0.00</span></p>
-                <p>GST: <span id="gst">0.00</span></p>
-                <p>Final Cost: <span id="finalCost">0.00</span></p>
-            </div>
+    <div class="total-section">
+        <p>Total Cost: <span id="totalCost">0.00</span></p>
+        <p>GST: <span id="gst">0.00</span></p>
+        <p>Final Cost: <span id="finalCost">0.00</span></p>
+        <p>Note: 50% advance, 30% after 50% work completion, 20% on project completion.</p>
+    </div>
 
-            <textarea id="note" readonly>
-Note:- 50 pct of the quoted amount has to be paid as advance, 30 PCT after completing 50 PCT of work, and remaining 20 PCT after completing the work.
-            </textarea>
+    <button onclick="downloadPDF()">Download Invoice PDF</button>
 
-            <button id="downloadInvoice">Download Invoice PDF</button>
-        </section>
-    </main>
+    <input type="file" id="uploadImage">
+    <button onclick="generate3D()">Generate 3D Design</button>
+    <div id="progressBar"><div id="progress">0%</div></div>
+    <div id="threeContainer"></div>
+</div>
 
-    <footer>
-        <p>Address: NO 39 BRN Ashish Layout Near Sri Thimmaraya Swami Gudi Anekal - 562106</p>
-        <p>Phone: +91 9916511599 & +91 8553608981</p>
-        <p>Email: Varshithinteriorsolutions@gmail.com</p>
-    </footer>
+<footer>
+    Address: NO 39 BRN Ashish Layout Near Sri Thimmaraya Swami Gudi Anekal - 562106 |
+    Phone: +91 9916511599 & +91 8553608981 |
+    Email: Varshithinteriorsolutions@gmail.com
+</footer>
 
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+<script>
+    // Add row to invoice table
+    function addRow() {
+        const tbody = document.getElementById("invoiceBody");
+        const row = tbody.insertRow();
+        for (let i = 0; i < 4; i++) {
+            const cell = row.insertCell();
+            cell.contentEditable = "true";
+            cell.innerText = i === 2 || i === 3 ? "0" : `Item`;
+            cell.addEventListener('input', calculateTotal);
+        }
+        calculateTotal();
+    }
+
+    // Calculate totals, GST, and final cost
+    function calculateTotal() {
+        let total = 0;
+        const rows = document.querySelectorAll("#invoiceBody tr");
+        rows.forEach(row => {
+            const amount = parseFloat(row.cells[3].innerText) || 0;
+            total += amount;
+        });
+        const gstPercent = parseFloat(document.getElementById("gstInput").value) || 0;
+        const gst = total * gstPercent / 100;
+        const finalCost = total + gst;
+        document.getElementById("totalCost").innerText = total.toFixed(2);
+        document.getElementById("gst").innerText = gst.toFixed(2);
+        document.getElementById("finalCost").innerText = finalCost.toFixed(2);
+    }
+
+    document.querySelectorAll("#invoiceBody td").forEach(td => td.addEventListener('input', calculateTotal));
+
+    // Download invoice as PDF
+    function downloadPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const pageHeight = 295;
+        const margin = 15;
+        let y = margin;
+
+        doc.setFontSize(16);
+        doc.text("Varshith Interior Solutions", 105, y, { align: "center" });
+        y += 10;
+
+        doc.setFontSize(12);
+        doc.text("Item | Material Used | Qty | Amount", margin, y);
+        y += 10;
+
+        const rows = document.querySelectorAll("#invoiceBody tr");
+        rows.forEach(row => {
+            const item = row.cells[0].innerText;
+            const material = row.cells[1].innerText;
+            const qty = row.cells[2].innerText;
+            const amount = row.cells[3].innerText;
+            doc.text(`${item} | ${material} | ${qty} | ${amount}`, margin, y);
+            y += 10;
+            if (y > pageHeight - 50) { 
+                doc.addPage();
+                y = margin;
+            }
+        });
+
+        y += 5;
+        doc.text(`Total Cost: ${document.getElementById("totalCost").innerText}`, margin, y);
+        y += 10;
+        doc.text(`GST: ${document.getElementById("gst").innerText}`, margin, y);
+        y += 10;
+        doc.text(`Final Cost: ${document.getElementById("finalCost").innerText}`, margin, y);
+        y += 10;
+        doc.text("Note: 50% advance, 30% after 50% work completion, 20% on project completion.", margin, y);
+
+        doc.save("invoice.pdf");
+    }
+
+    // Generate 3D design from uploaded image
+    let scene, camera, renderer, cube;
+    function generate3D() {
+        const fileInput = document.getElementById("uploadImage");
+        if (!fileInput.files[0]) {
+            alert("Upload a 2D image first!");
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const texture = new THREE.TextureLoader().load(event.target.result);
+
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth/400, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, 400);
+            document.getElementById("threeContainer").innerHTML = "";
+            document.getElementById("threeContainer").appendChild(renderer.domElement);
+
+            const geometry = new THREE.BoxGeometry();
+            const material = new THREE.MeshBasicMaterial({ map: texture });
+            cube = new THREE.Mesh(geometry, material);
+            scene.add(cube);
+
+            camera.position.z = 5;
+
+            let progress = 0;
+            const progressBar = document.getElementById("progress");
+            const interval = setInterval(() => {
+                progress += 10;
+                progressBar.style.width = progress + "%";
+                progressBar.innerText = progress + "%";
+                if(progress >= 100) clearInterval(interval);
+            }, 200);
+
+            function animate() {
+                requestAnimationFrame(animate);
+                cube.rotation.x += 0.01;
+                cube.rotation.y += 0.01;
+                renderer.render(scene, camera);
+            }
+            animate();
+        }
+        reader.readAsDataURL(fileInput.files[0]);
+    }
+</script>
+
 </body>
 </html>
