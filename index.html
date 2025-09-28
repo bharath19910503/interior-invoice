@@ -9,8 +9,9 @@
     <header>
         <h1>Varshith Interior Solution</h1>
     </header>
+
     <main>
-        <section>
+        <section class="upload-section">
             <h2>Upload 2D Design</h2>
             <form id="uploadForm" enctype="multipart/form-data">
                 <input type="file" name="design" accept="image/*">
@@ -20,7 +21,7 @@
             <div id="preview3d"></div>
         </section>
 
-        <section>
+        <section class="invoice-section">
             <h2>Invoice</h2>
             <table id="invoiceTable">
                 <thead>
@@ -41,15 +42,14 @@
                 <p>Final Cost: <span id="finalCost">0.00</span></p>
             </div>
 
-            <div>
-                <textarea id="note" readonly>
-Note:- 50 pct of the quoted amount has to be paid as advance 30 PCT amount should be paid after completing 50 PCT of work and remaining 20 PCT should be paid at the completing the work
-                </textarea>
-            </div>
+            <textarea id="note" readonly>
+Note:- 50 pct of the quoted amount has to be paid as advance, 30 PCT after completing 50 PCT of work, and remaining 20 PCT after completing the work.
+            </textarea>
 
             <button id="downloadInvoice">Download Invoice PDF</button>
         </section>
     </main>
+
     <footer>
         <p>Address: NO 39 BRN Ashish Layout Near Sri Thimmaraya Swami Gudi Anekal - 562106</p>
         <p>Phone: +91 9916511599 & +91 8553608981</p>

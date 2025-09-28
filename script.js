@@ -1,3 +1,4 @@
+// Add invoice row
 document.getElementById("addRow").addEventListener("click", function() {
     const tbody = document.querySelector("#invoiceTable tbody");
     const row = document.createElement("tr");
@@ -11,21 +12,24 @@ document.getElementById("addRow").addEventListener("click", function() {
     updateTotals();
 });
 
+// Update totals
 function updateTotals() {
     let total = 0;
     document.querySelectorAll("#invoiceTable tbody tr").forEach(row => {
         const amount = parseFloat(row.cells[3].innerText) || 0;
         total += amount;
     });
-    const gst = total * 0.18; // default 18%
+    const gst = total * 0.18;
     const finalCost = total + gst;
     document.getElementById("totalCost").innerText = total.toFixed(2);
     document.getElementById("gst").innerText = gst.toFixed(2);
     document.getElementById("finalCost").innerText = finalCost.toFixed(2);
 }
 
+// Recalculate when table content changes
 document.getElementById("invoiceTable").addEventListener("input", updateTotals);
 
+// Download Invoice PDF
 document.getElementById("downloadInvoice").addEventListener("click", function() {
     const html = document.querySelector("main").innerHTML;
     fetch("/download_invoice", {
@@ -41,6 +45,7 @@ document.getElementById("downloadInvoice").addEventListener("click", function() 
       });
 });
 
+// Upload 2D design and show 3D preview
 document.getElementById("uploadForm").addEventListener("submit", function(e){
     e.preventDefault();
     const formData = new FormData(this);
