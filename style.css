@@ -1,4 +1,7 @@
-:root{--green:#2e7d32;--muted:#f4f6f5;}
+:root{
+  --green:#2e7d32;
+  --muted:#f4f6f5;
+}
 *{box-sizing:border-box}
 body{font-family:Arial,Helvetica,sans-serif;margin:0;background:var(--muted);color:#222}
 header{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:var(--green);color:#fff}
@@ -20,11 +23,6 @@ main{display:flex;gap:20px;padding:18px}
 .invoice-table th{background:var(--green);color:#fff;white-space:nowrap}
 .invoice-table td input{width:100%;border:0;padding:4px;outline:none}
 .invoice-table td .deleteBtn{background:#c62828;color:#fff;border:none;padding:6px 8px;border-radius:4px;cursor:pointer}
-.invoice-table th:nth-child(1){width:20%}
-.invoice-table th:nth-child(2){width:25%}
-.invoice-table th:nth-child(3){width:10%}
-.invoice-table th:nth-child(4){width:15%}
-.invoice-table th:nth-child(5){width:15%}
 .summary{margin-top:10px;display:flex;gap:18px;align-items:center}
 .summary div{background:#fff;padding:8px;border-radius:6px;border:1px solid #eee;min-width:150px}
 .summary .final{font-weight:700}
