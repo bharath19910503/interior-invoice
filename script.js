@@ -1,113 +1,86 @@
 let designs = [];
 
-function formatINR(amount) {
-  return '₹' + amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const designList = document.getElementById('design-list');
+const addBtn = document.getElementById('add-design');
+const generateBtn = document.getElementById('generate-pdf');
+
+function formatINR(num){
+  return '₹ ' + num.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 }
 
-function addDesign() {
-  const id = Date.now();
-  designs.push({ id, name: '', amount: 0, thumb: '#' });
-  renderDesigns();
-}
-
-function removeDesign(id) {
-  designs = designs.filter(d => d.id !== id);
-  renderDesigns();
-  updatePaymentBreakdown();
-}
-
-function renderDesigns() {
-  const container = document.querySelector('.design-list');
-  container.innerHTML = '';
-  designs.forEach(d => {
+function renderDesigns(){
+  designList.innerHTML = '';
+  designs.forEach((d, index)=>{
     const div = document.createElement('div');
     div.className = 'design-item';
-    div.dataset.id = d.id;
     div.innerHTML = `
-      <img class="design-thumb" src="${d.thumb}" alt="Thumbnail">
+      <img src="${d.thumb || '#'}" class="design-thumb">
       <div class="design-info">
         <input type="text" value="${d.name}" placeholder="Designer Name" class="designer-name">
         <input type="number" value="${d.amount}" placeholder="Amount (INR)" class="design-amount" min="0">
-        <div class="payment-breakdown" style="font-size:12px; color:#555; margin-top:4px;">
-          Advance (50%): ${formatINR(d.amount*0.5)} | After 50% work (30%): ${formatINR(d.amount*0.3)} | On Completion (20%): ${formatINR(d.amount*0.2)}
-        </div>
+        <input type="file" accept="image/*" class="design-thumb-input">
       </div>
       <div class="design-controls">
-        <button class="deleteBtn">Delete</button>
+        <button class="delete-btn">Delete</button>
       </div>
     `;
-    container.appendChild(div);
 
-    div.querySelector('.design-amount').addEventListener('input', (e) => {
-      d.amount = parseFloat(e.target.value) || 0;
-      updateDesignPayment(div, d.amount);
+    div.querySelector('.designer-name').addEventListener('input', e=> d.name = e.target.value);
+    div.querySelector('.design-amount').addEventListener('input', e=> d.amount = parseFloat(e.target.value));
+    
+    div.querySelector('.design-thumb-input').addEventListener('change', (e)=>{
+      const file = e.target.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = evt=>{
+        d.thumb = evt.target.result;
+        div.querySelector('.design-thumb').src = d.thumb;
+      }
+      reader.readAsDataURL(file);
     });
-    div.querySelector('.designer-name').addEventListener('input', (e) => {
-      d.name = e.target.value;
+
+    div.querySelector('.delete-btn').addEventListener('click', ()=>{
+      designs.splice(index,1);
+      renderDesigns();
     });
-    div.querySelector('.deleteBtn').addEventListener('click', () => removeDesign(d.id));
+
+    designList.appendChild(div);
   });
-  updatePaymentBreakdown();
 }
 
-function updateDesignPayment(div, amount) {
-  const pb = div.querySelector('.payment-breakdown');
-  pb.innerHTML = `
-    Advance (50%): ${formatINR(amount*0.5)} | After 50% work (30%): ${formatINR(amount*0.3)} | On Completion (20%): ${formatINR(amount*0.2)}
-  `;
-  updatePaymentBreakdown();
-}
+addBtn.addEventListener('click', ()=>{
+  designs.push({name:'', amount:0, thumb:'#'});
+  renderDesigns();
+});
 
-function updatePaymentBreakdown() {
-  let total = designs.reduce((sum, d) => sum + (d.amount || 0), 0);
-  const advance = total*0.5, mid = total*0.3, final = total*0.2;
-  const div = document.getElementById('paymentBreakdown');
-  div.innerHTML = `
-    <strong>Total Payment Breakdown (INR):</strong>
-    <div>Advance (50%): ${formatINR(advance)}</div>
-    <div>After 50% work (30%): ${formatINR(mid)}</div>
-    <div>On Completion (20%): ${formatINR(final)}</div>
-  `;
-}
-
-// PDF Generation
-async function generatePDF() {
-  const { jsPDF } = window.jspdf;
+// PDF generation using jsPDF
+generateBtn.addEventListener('click', ()=>{
+  if(designs.length === 0){ alert("Add at least one design"); return; }
   const doc = new jsPDF();
-
   let y = 20;
   doc.setFontSize(16);
-  doc.text("Invoice", 105, y, { align: "center" });
-
+  doc.text("Invoice", 105, y, null, null, "center");
   y += 10;
-  designs.forEach(d => {
-    doc.setFontSize(12);
-    doc.text(`Designer: ${d.name}`, 20, y);
-    doc.text(`Amount: ${formatINR(d.amount)}`, 120, y);
-    y += 6;
-    doc.text(`Advance (50%): ${formatINR(d.amount*0.5)}`, 25, y);
-    y += 5;
-    doc.text(`After 50% work (30%): ${formatINR(d.amount*0.3)}`, 25, y);
-    y += 5;
-    doc.text(`On Completion (20%): ${formatINR(d.amount*0.2)}`, 25, y);
-    y += 10;
+  designs.forEach(d=>{
+    if(d.thumb && d.thumb !== '#'){
+      try{ doc.addImage(d.thumb,'JPEG',20,y,40,30);}catch(e){console.error(e);}
+      doc.text(`Designer: ${d.name}`,65,y+8);
+      doc.text(`Amount: ${formatINR(d.amount)}`,65,y+14);
+      doc.text(`Advance (50%): ${formatINR(d.amount*0.5)}`,65,y+20);
+      doc.text(`After 50% work (30%): ${formatINR(d.amount*0.3)}`,65,y+26);
+      doc.text(`On Completion (20%): ${formatINR(d.amount*0.2)}`,65,y+32);
+      y += 40;
+    } else {
+      doc.text(`Designer: ${d.name}`,20,y);
+      doc.text(`Amount: ${formatINR(d.amount)}`,120,y);
+      y += 6;
+      doc.text(`Advance (50%): ${formatINR(d.amount*0.5)}`,25,y);
+      y += 5;
+      doc.text(`After 50% work (30%): ${formatINR(d.amount*0.3)}`,25,y);
+      y += 5;
+      doc.text(`On Completion (20%): ${formatINR(d.amount*0.2)}`,25,y);
+      y += 10;
+    }
   });
-
-  // Total
-  let total = designs.reduce((sum,d)=>sum+(d.amount||0),0);
-  doc.setFontSize(14);
-  doc.text("Total Payment Breakdown:", 20, y);
-  y += 6;
-  doc.setFontSize(12);
-  doc.text(`Advance (50%): ${formatINR(total*0.5)}`, 25, y);
-  y += 5;
-  doc.text(`After 50% work (30%): ${formatINR(total*0.3)}`, 25, y);
-  y += 5;
-  doc.text(`On Completion (20%): ${formatINR(total*0.2)}`, 25, y);
-
-  doc.save("invoice.pdf");
-}
-
-// Event Listeners
-document.getElementById('addDesignBtn').addEventListener('click', addDesign);
-document.getElementById('generatePdfBtn').addEventListener('click', generatePDF);
+  doc.save("Invoice.pdf");
+});

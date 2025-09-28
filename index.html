@@ -9,10 +9,10 @@
 <body>
 <header>
   <div class="header-left">
-    <img src="#" alt="Logo">
+    <img src="#" alt="Logo" id="company-logo">
     <div>
       <h1>Company Name</h1>
-      <div class="company-sub">Your tagline here</div>
+      <div class="company-sub">Invoice Generator</div>
     </div>
   </div>
 </header>
@@ -20,21 +20,22 @@
 <main>
   <div class="left-col">
     <div class="controls">
-      <button id="addDesignBtn">Add 2D → 3D Design</button>
+      <button id="add-design">Add 2D → 3D Design</button>
+      <button id="generate-pdf">Generate PDF</button>
     </div>
-    <div class="design-list"></div>
 
-    <div id="paymentBreakdown" class="summary" style="flex-direction: column;"></div>
+    <div class="design-list" id="design-list">
+      <!-- Designs will be added here -->
+    </div>
   </div>
 
   <div class="right-col">
-    <button id="generatePdfBtn" class="primary">Generate PDF</button>
+    <div class="preview-3d" id="preview-3d">PDF Preview Will Appear Here</div>
   </div>
 </main>
 
-<footer>© 2025 Company Name. All rights reserved.</footer>
+<footer>Invoice Generator &copy; 2025</footer>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
