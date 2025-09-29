@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Varshith Interior Solutions — Invoice & 3D Preview</title>
+
   <link rel="stylesheet" href="style.css">
 
   <!-- jsPDF + AutoTable -->
@@ -65,9 +66,7 @@
               <th></th>
             </tr>
           </thead>
-          <tbody>
-            <!-- rows inserted dynamically -->
-          </tbody>
+          <tbody></tbody>
         </table>
       </div>
 
@@ -83,11 +82,6 @@
         <input id="importJsonFile" type="file" accept=".json" style="display:none"/>
         <button id="importJsonBtn">Import Invoice (JSON)</button>
       </div>
-
-      <div class="load-section">
-        <input id="loadInvoiceNumber" placeholder="Enter Invoice Number">
-        <button id="loadInvoiceBtn">Load Invoice</button>
-      </div>
     </section>
 
     <section class="right-col">
@@ -95,17 +89,17 @@
 
       <div class="uploader">
         <input id="upload2D" type="file" accept="image/*" multiple>
-        <div class="hint">Select multiple images; each will appear below with a name and Generate 3D button.</div>
+        <div class="hint">Select multiple 2D images; each will appear below with a name and Generate 3D button.</div>
       </div>
 
       <div id="designList" class="design-list"></div>
 
-      <div id="progressContainer" class="progress-container" aria-hidden="true" style="display:none;">
+      <div id="progressContainer" class="progress-container" style="display:none;">
         <div id="progressBar" class="progress-bar"></div>
       </div>
 
       <div id="preview3D" class="preview-3d"></div>
-      <div class="preview-note">Click "Generate 3D" for any design to preview and capture a snapshot (embedded into PDF).</div>
+      <div class="preview-note">Click "Generate 3D" for any design to preview and capture a snapshot for PDF.</div>
     </section>
   </main>
 
