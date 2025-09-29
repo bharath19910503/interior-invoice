@@ -1,117 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Varshith Interior Solutions — Invoice & 3D Preview</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Varshith Interior Solutions — Invoice & 3D Preview</title>
 
-<!-- jsPDF + AutoTable -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+  <link rel="stylesheet" href="style.css">
 
-<!-- Three.js + OrbitControls -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/three.min.js"></script>
-<script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
+  <!-- jsPDF + AutoTable -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+  <!-- Three.js + OrbitControls -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/three.min.js"></script>
+  <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
 </head>
 <body>
-<header>
-  <div class="header-left">
-    <img id="logoImg" src="" alt="Logo (upload below)" />
-    <div class="logo-upload">
-      <label class="btn">Upload Logo
-        <input id="logoUpload" type="file" accept="image/*">
-      </label>
-    </div>
-  </div>
-  <div class="header-center">
-    <h1>Varshith Interior Solutions</h1>
-    <div class="company-sub">NO 39 BRN Ashish Layout, Near Sri Thimmaraya Swami Gudi, Anekal - 562106</div>
-  </div>
-  <div class="header-right">
-    <div>Phone: +91 9916511599</div>
-    <div>Phone: +91 8553608981</div>
-    <div>Email: Varshithinteriorsolutions@gmail.com</div>
-  </div>
-</header>
-
-<main>
-  <section class="left-col">
-    <h2>Invoice</h2>
-
-    <div class="invoice-meta">
-      <input id="clientName" placeholder="Client Name">
-      <input id="invoiceNumber" placeholder="Invoice Number">
-      <input id="invoiceDate" type="date">
+  <header>
+    <div class="header-left">
+      <img id="logoImg" src="" alt="Logo (upload below)" />
+      <div class="logo-upload">
+        <label class="btn">Upload Logo
+          <input id="logoUpload" type="file" accept="image/*">
+        </label>
+      </div>
     </div>
 
-    <div class="controls">
-      <button id="addRowBtn">Add Item</button>
-      <button id="clearRowsBtn">Clear All</button>
-      <label>GST % <input id="gstPercent" type="number" value="18" min="0" step="0.1"></label>
+    <div class="header-center">
+      <h1>Varshith Interior Solutions</h1>
+      <div class="company-sub">NO 39 BRN Ashish Layout, Near Sri Thimmaraya Swami Gudi, Anekal - 562106</div>
     </div>
 
-    <div class="table-wrap">
-      <table id="invoiceTable" class="invoice-table">
-        <thead>
-          <tr>
-            <th>Item</th>
-            <th>Material Used</th>
-            <th>Qty</th>
-            <th>Unit Price</th>
-            <th>Amount</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+    <div class="header-right">
+      <div>Phone: +91 9916511599</div>
+      <div>Phone: +91 8553608981</div>
+      <div>Email: Varshithinteriorsolutions@gmail.com</div>
     </div>
+  </header>
 
-    <div class="summary">
-      <div>Total Cost: <span id="totalCost">0.00</span></div>
-      <div>GST: <span id="gstAmount">0.00</span></div>
-      <div class="final">Final Cost: <span id="finalCost">0.00</span></div>
-    </div>
+  <main>
+    <section class="left-col">
+      <h2>Invoice</h2>
 
-    <div class="actions">
-      <button id="generatePDFBtn" class="primary">Download Invoice PDF</button>
-      <button id="exportJsonBtn">Export Invoice (JSON)</button>
-      <input id="importJsonFile" type="file" accept=".json" style="display:none"/>
-      <button id="importJsonBtn">Import Invoice (JSON)</button>
-    </div>
+      <div class="invoice-meta">
+        <input id="clientName" placeholder="Client Name">
+        <input id="invoiceNumber" placeholder="Invoice Number">
+        <input id="invoiceDate" type="date">
+      </div>
 
-    <div class="actions">
-      <input id="recoverInvoiceNumber" placeholder="Invoice Number to recover">
-      <button id="recoverInvoiceBtn">Recover Invoice</button>
-      <button id="saveInvoiceBtn">Save Invoice</button>
-    </div>
-  </section>
+      <div class="controls">
+        <button id="addRowBtn">Add Item</button>
+        <button id="clearRowsBtn">Clear All</button>
+        <label>GST % <input id="gstPercent" type="number" value="18" min="0" step="0.1"></label>
+      </div>
 
-  <section class="right-col">
-    <h2>2D → 3D Designer</h2>
+      <div class="table-wrap">
+        <table id="invoiceTable" class="invoice-table">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Material Used</th>
+              <th>Qty</th>
+              <th>Unit Price</th>
+              <th>Amount</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- rows inserted dynamically -->
+          </tbody>
+        </table>
+      </div>
 
-    <div class="uploader">
-      <input id="upload2D" type="file" accept="image/*" multiple>
-      <div class="hint">Select multiple 2D images; each will appear below with a name and Generate 3D button.</div>
-    </div>
+      <div class="summary">
+        <div>Total Cost: <span id="totalCost">0.00</span></div>
+        <div>GST: <span id="gstAmount">0.00</span></div>
+        <div class="final">Final Cost: <span id="finalCost">0.00</span></div>
+      </div>
 
-    <div id="designList" class="design-list"></div>
+      <div class="actions">
+        <button id="generatePDFBtn" class="primary">Download Invoice PDF</button>
+        <button id="exportJsonBtn">Export Invoice (JSON)</button>
+        <input id="importJsonFile" type="file" accept=".json" style="display:none"/>
+        <button id="importJsonBtn">Import Invoice (JSON)</button>
+      </div>
+    </section>
 
-    <div id="progressContainer" class="progress-container" style="display:none;">
-      <div id="progressBar" class="progress-bar"></div>
-    </div>
+    <section class="right-col">
+      <h2>2D → 3D Designer</h2>
 
-    <div id="preview3D" class="preview-3d"></div>
-    <div class="preview-note">Click "Generate 3D" for any design to preview and capture a snapshot (embedded into PDF).</div>
-  </section>
-</main>
+      <div class="uploader">
+        <input id="upload2D" type="file" accept="image/*" multiple>
+        <div class="hint">Select multiple images; each will appear below with a name and Generate 3D button.</div>
+      </div>
 
-<footer>
-  <div>Address: NO 39 BRN Ashish Layout Near Sri Thimmaraya Swami Gudi Anekal - 562106</div>
-  <div>Phone: +91 9916511599 &amp; +91 8553608981 | Email: Varshithinteriorsolutions@gmail.com</div>
-  <div class="copyright">© 2025 Varshith Interior Solutions</div>
-</footer>
+      <div id="designList" class="design-list"></div>
 
-<script src="script.js"></script>
+      <div id="preview3D" class="preview-3d"></div>
+      <div class="preview-note">Click "Generate 3D" for any design to preview and capture a snapshot (embedded into PDF).</div>
+    </section>
+  </main>
+
+  <footer>
+    <div>Address: NO 39 BRN Ashish Layout Near Sri Thimmaraya Swami Gudi Anekal - 562106</div>
+    <div>Phone: +91 9916511599 &amp; +91 8553608981 | Email: Varshithinteriorsolutions@gmail.com</div>
+    <div class="copyright">© 2025 Varshith Interior Solutions</div>
+  </footer>
+
+  <script src="script.js"></script>
 </body>
 </html>
