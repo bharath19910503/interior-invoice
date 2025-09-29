@@ -46,6 +46,7 @@
         <input id="clientName" placeholder="Client Name">
         <input id="invoiceNumber" placeholder="Invoice Number">
         <input id="invoiceDate" type="date">
+        <button id="recoverInvoiceBtn">Recover Invoice</button>
       </div>
 
       <div class="controls">
@@ -66,7 +67,8 @@
               <th></th>
             </tr>
           </thead>
-          <tbody></tbody>
+          <tbody>
+          </tbody>
         </table>
       </div>
 
@@ -94,7 +96,7 @@
 
       <div id="designList" class="design-list"></div>
 
-      <div id="progressContainer" class="progress-container" style="display:none;">
+      <div id="progressContainer" class="progress-container" aria-hidden="true" style="display:none;">
         <div id="progressBar" class="progress-bar"></div>
       </div>
 
