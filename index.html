@@ -24,10 +24,12 @@
         </label>
       </div>
     </div>
+
     <div class="header-center">
       <h1>Varshith Interior Solutions</h1>
       <div class="company-sub">NO 39 BRN Ashish Layout, Near Sri Thimmaraya Swami Gudi, Anekal - 562106</div>
     </div>
+
     <div class="header-right">
       <div>Phone: +91 9916511599</div>
       <div>Phone: +91 8553608981</div>
@@ -38,16 +40,19 @@
   <main>
     <section class="left-col">
       <h2>Invoice</h2>
+
       <div class="invoice-meta">
         <input id="clientName" placeholder="Client Name">
         <input id="invoiceNumber" placeholder="Invoice Number">
         <input id="invoiceDate" type="date">
       </div>
+
       <div class="controls">
         <button id="addRowBtn">Add Item</button>
         <button id="clearRowsBtn">Clear All</button>
         <label>GST % <input id="gstPercent" type="number" value="18" min="0" step="0.1"></label>
       </div>
+
       <div class="table-wrap">
         <table id="invoiceTable" class="invoice-table">
           <thead>
@@ -60,32 +65,45 @@
               <th></th>
             </tr>
           </thead>
-          <tbody></tbody>
+          <tbody>
+            <!-- rows inserted dynamically -->
+          </tbody>
         </table>
       </div>
+
       <div class="summary">
         <div>Total Cost: <span id="totalCost">0.00</span></div>
         <div>GST: <span id="gstAmount">0.00</span></div>
         <div class="final">Final Cost: <span id="finalCost">0.00</span></div>
       </div>
+
       <div class="actions">
         <button id="generatePDFBtn" class="primary">Download Invoice PDF</button>
         <button id="exportJsonBtn">Export Invoice (JSON)</button>
         <input id="importJsonFile" type="file" accept=".json" style="display:none"/>
         <button id="importJsonBtn">Import Invoice (JSON)</button>
       </div>
+
+      <div class="load-section">
+        <input id="loadInvoiceNumber" placeholder="Enter Invoice Number">
+        <button id="loadInvoiceBtn">Load Invoice</button>
+      </div>
     </section>
 
     <section class="right-col">
       <h2>2D → 3D Designer</h2>
+
       <div class="uploader">
         <input id="upload2D" type="file" accept="image/*" multiple>
         <div class="hint">Select multiple images; each will appear below with a name and Generate 3D button.</div>
       </div>
+
       <div id="designList" class="design-list"></div>
+
       <div id="progressContainer" class="progress-container" aria-hidden="true" style="display:none;">
         <div id="progressBar" class="progress-bar"></div>
       </div>
+
       <div id="preview3D" class="preview-3d"></div>
       <div class="preview-note">Click "Generate 3D" for any design to preview and capture a snapshot (embedded into PDF).</div>
     </section>
