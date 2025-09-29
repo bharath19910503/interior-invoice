@@ -71,7 +71,6 @@ clearRowsBtn.addEventListener("click", () => {
   designs = [];
   designList.innerHTML = "";
   logoImg.src = "";
-  localStorage.removeItem("currentInvoice");
 });
 
 // Upload logo
@@ -146,7 +145,6 @@ document.getElementById("generatePDFBtn").addEventListener("click", () => {
   }
 
   const doc = new jsPDF();
-
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
 
@@ -212,7 +210,7 @@ document.getElementById("generatePDFBtn").addEventListener("click", () => {
     }
   });
 
-  // Footer with page numbers and contact info
+  // Footer with page numbers + contact info
   const pageCount = doc.internal.getNumberOfPages();
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
