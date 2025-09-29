@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Varshith Interior Solutions — Invoice & 3D Preview</title>
+
   <link rel="stylesheet" href="style.css">
 
   <!-- jsPDF + AutoTable -->
@@ -43,16 +44,15 @@
 
       <div class="invoice-meta">
         <input id="clientName" placeholder="Client Name">
-        <input id="clientGST" placeholder="Client GST Number">
         <input id="invoiceNumber" placeholder="Invoice Number">
         <input id="invoiceDate" type="date">
+        <input id="clientGST" placeholder="Client GST Number">
+        <input id="ourGST" placeholder="Our GST Number">
       </div>
 
       <div class="controls">
         <button id="addRowBtn">Add Item</button>
         <button id="clearRowsBtn">Clear All</button>
-        <label>GST % <input id="gstPercent" type="number" value="18" min="0" step="0.1"></label>
-        <button id="recoverInvoiceBtn">Recover Invoice</button>
       </div>
 
       <div class="table-wrap">
@@ -73,13 +73,13 @@
 
       <div class="summary">
         <div>Total Cost: <span id="totalCost">0.00</span></div>
-        <div>GST: <span id="gstAmount">0.00</span></div>
+        <div>GST Amount: <span id="gstAmount">0.00</span></div>
         <div class="final">Final Cost: <span id="finalCost">0.00</span></div>
       </div>
 
-      <textarea id="paymentNote" rows="3">
-Payment note: 50% of the quoted amount has to be paid as advance, 30% after completing 50% of work and remaining 20% after the completion of work.
-      </textarea>
+      <div class="payment-note">
+        Payment note: 50% of the quoted amount has to be paid as advance, 30% after completing 50% of work and remaining 20% after the completion of work.
+      </div>
 
       <div class="actions">
         <button id="generatePDFBtn" class="primary">Download Invoice PDF</button>
@@ -109,8 +109,9 @@ Payment note: 50% of the quoted amount has to be paid as advance, 30% after comp
   </main>
 
   <footer>
-    <div>Address: NO 39 BRN Ashish Layout Near Sri Thimmaraya Swami Gudi Anekal - 562106</div>
+    <div>Address: NO 39 BRN Ashish Layout, Near Sri Thimmaraya Swami Gudi, Anekal - 562106</div>
     <div>Phone: +91 9916511599 &amp; +91 8553608981 | Email: Varshithinteriorsolutions@gmail.com</div>
+    <div>GST: <span id="footerGST">Your GST Number</span></div>
     <div class="copyright">© 2025 Varshith Interior Solutions</div>
   </footer>
 
